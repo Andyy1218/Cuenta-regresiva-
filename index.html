@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuenta Regresiva a Nuestro Encuentro</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --rose: #e8405a;
+    --rose-light: #f7c5ce;
+    --rose-pale: #fce8ec;
+    --cream: #fff9f9;
+    --text: #4a1a25;
+    --muted: #9e6070;
+  }
+
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fce8ec 0%, #ffd6df 40%, #fce4ef 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Lato', sans-serif;
+    padding: 20px;
+  }
+
+  /* Soft bokeh circles in background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(232,64,90,0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(232,64,90,0.07) 0%, transparent 40%),
+      radial-gradient(circle at 50% 10%, rgba(255,255,255,0.4) 0%, transparent 30%);
+    pointer-events: none;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(20px);
+    border-radius: 32px;
+    padding: 48px 52px 44px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow:
+      0 8px 60px rgba(232,64,90,0.15),
+      0 2px 12px rgba(232,64,90,0.08),
+      inset 0 1px 0 rgba(255,255,255,0.9);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle corner flourish */
+  .card::after {
+    content: '✦';
+    position: absolute;
+    bottom: 18px;
+    right: 24px;
+    font-size: 18px;
+    color: var(--rose-light);
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 5vw, 30px);
+    color: var(--rose);
+    line-height: 1.25;
+    letter-spacing: -0.3px;
+    margin-bottom: 36px;
+  }
+
+  /* ─── PHOTOS + FLAGS + PATH ─────────────────────────── */
+  .journey {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    padding: 0 8px;
+  }
+
+  .person {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    z-index: 2;
+  }
+
+  .photo-ring {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    border: 3px solid var(--rose);
+    padding: 3px;
+    background: white;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(232,64,90,0.2);
+  }
+
+  .photo-ring img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose-pale), var(--rose-light));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
+  .flag {
+    font-size: 26px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  }
+
+  .person-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.3px;
+  }
+
+  /* ─── SVG PATH TRACK ─────────────────────────────────── */
+  .path-track {
+    position: absolute;
+    top: 38px; /* vertically center on photos */
+    left: 80px;
+    right: 80px;
+    height: 60px;
+    pointer-events: none;
+  }
+
+  .path-track svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* The dashed curved path */
+  #flight-path {
+    fill: none;
+    stroke: var(--rose);
+    stroke-width: 2;
+    stroke-dasharray: 7 5;
+    opacity: 0.55;
+  }
+
+  /* ─── ANIMATED PLANE ──────────────────────────────────── */
+  .plane-wrapper {
+    position: absolute;
+    top: 38px;
+    left: 80px;
+    right: 80px;
+    height: 60px;
+    pointer-events: none;
+  }
+
+  #plane {
+    position: absolute;
+    font-size: 22px;
+    transform: translate(-50%, -50%);
+    filter: drop-shadow(0 2px 6px rgba(232,64,90,0.3));
+    transition: none;
+  }
+
+  /* ─── COUNTDOWN BOX ───────────────────────────────────── */
+  .countdown-box {
+    background: linear-gradient(135deg, #fff5f7 0%, #ffeef2 100%);
+    border: 1.5px solid rgba(232,64,90,0.15);
+    border-radius: 20px;
+    padding: 28px 20px 22px;
+    margin-bottom: 28px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 16px rgba(232,64,90,0.06);
+  }
+
+  .countdown-grid {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 72px;
+  }
+
+  .time-number {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 10vw, 62px);
+    font-weight: 700;
+    color: var(--rose);
+    line-height: 1;
+    letter-spacing: -1px;
+  }
+
+  .time-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: lowercase;
+    margin-top: 4px;
+  }
+
+  .time-sep {
+    font-family: 'Playfair Display', serif;
+    font-size: 50px;
+    color: var(--rose-light);
+    line-height: 1;
+    padding-top: 2px;
+    font-weight: 300;
+    align-self: flex-start;
+  }
+
+  /* Progress bar under countdown */
+  .progress-wrap {
+    margin-top: 18px;
+    height: 4px;
+    background: rgba(232,64,90,0.12);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose-light), var(--rose));
+    border-radius: 99px;
+    transition: width 1s linear;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2px;
+  }
+
+  /* ─── PHRASE ─────────────────────────────────────────── */
+  .phrase {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 20px;
+    padding: 0 12px;
+  }
+
+  .phrase::before { content: '"'; }
+  .phrase::after  { content: '"'; }
+
+  /* ─── HEART ──────────────────────────────────────────── */
+  .heart {
+    font-size: 26px;
+    animation: heartbeat 1.4s ease-in-out infinite;
+    display: inline-block;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15%       { transform: scale(1.22); }
+    30%       { transform: scale(1); }
+    45%       { transform: scale(1.14); }
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────── */
+  @media (max-width: 480px) {
+    .card { padding: 32px 24px 32px; }
+    .photo-ring { width: 64px; height: 64px; }
+    .path-track, .plane-wrapper { left: 68px; right: 68px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <h1>Cuenta Regresiva a<br>Nuestro Encuentro</h1>
+
+  <!-- Journey row -->
+  <div class="journey">
+    <!-- Him (Colombia) -->
+    <div class="person">
+      <div class="photo-ring">
+        <div class="photo-placeholder">👨</div>
+      </div>
+      <span class="flag">🇨🇴</span>
+      <span class="person-label">Colombia</span>
+    </div>
+
+    <!-- Dashed arc path -->
+    <div class="path-track">
+      <svg viewBox="0 0 300 60" preserveAspectRatio="none">
+        <path id="flight-path" d="M 0,50 Q 150,-10 300,50"/>
+      </svg>
+    </div>
+
+    <!-- Plane follows the path via JS -->
+    <div class="plane-wrapper" id="plane-container">
+      <span id="plane">✈️</span>
+    </div>
+
+    <!-- Her (Spain) -->
+    <div class="person">
+      <div class="photo-ring">
+        <div class="photo-placeholder">👩</div>
+      </div>
+      <span class="flag">🇪🇸</span>
+      <span class="person-label">España</span>
+    </div>
+  </div>
+
+  <!-- Countdown -->
+  <div class="countdown-box">
+    <div class="countdown-grid">
+      <div class="time-block">
+        <div class="time-number" id="days">---</div>
+        <div class="time-label">días</div>
+      </div>
+      <div class="time-sep">·</div>
+      <div class="time-block">
+        <div class="time-number" id="hours">--</div>
+        <div class="time-label">horas</div>
+      </div>
+      <div class="time-sep">·</div>
+      <div class="time-block">
+        <div class="time-number" id="minutes">--</div>
+        <div class="time-label">minutos</div>
+      </div>
+      <div class="time-sep">·</div>
+      <div class="time-block">
+        <div class="time-number" id="seconds">--</div>
+        <div class="time-label">segundos</div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-wrap">
+      <div id="progress-bar" style="width: 0%"></div>
+    </div>
+    <div class="progress-labels">
+      <span>12 Feb 2026</span>
+      <span id="pct-label">0% del camino</span>
+      <span>25 Jul 2026</span>
+    </div>
+  </div>
+
+  <p class="phrase">Cada día un suspiro menos para nuestro abrazo.</p>
+  <div class="heart">❤️</div>
+</div>
+
+<script>
+  // ── Dates ────────────────────────────────────────────────
+  const START  = new Date('2026-02-12T00:00:00');   // inicio del contador
+  const TARGET = new Date('2026-07-25T00:00:00');   // día del encuentro
+  const TOTAL_MS = TARGET - START;
+
+  // ── Quadratic bezier helpers ─────────────────────────────
+  // Path: M 0,50 Q 150,-10 300,50  (SVG viewBox 300×60)
+  function bezierPoint(t, p0, p1, p2) {
+    const inv = 1 - t;
+    return inv * inv * p0 + 2 * inv * t * p1 + t * t * p2;
+  }
+
+  function getPlanePos(t) {
+    // SVG coords
+    const svgX = bezierPoint(t,   0, 150, 300);
+    const svgY = bezierPoint(t,  50, -10,  50);
+    return { svgX, svgY };
+  }
+
+  // ── DOM refs ─────────────────────────────────────────────
+  const plane      = document.getElementById('plane');
+  const container  = document.getElementById('plane-container');
+  const dDays      = document.getElementById('days');
+  const dHours     = document.getElementById('hours');
+  const dMinutes   = document.getElementById('minutes');
+  const dSeconds   = document.getElementById('seconds');
+  const progressBar= document.getElementById('progress-bar');
+  const pctLabel   = document.getElementById('pct-label');
+
+  // ── Plane position ───────────────────────────────────────
+  function updatePlane(progress) {
+    // progress: 0 = at Colombia, 1 = at Spain
+    const rect = container.getBoundingClientRect();
+    const W = container.offsetWidth;
+    const H = container.offsetHeight;
+
+    // Get point on bezier (SVG is 300×60 units)
+    const { svgX, svgY } = getPlanePos(progress);
+    const px = (svgX / 300) * W;
+    const py = (svgY /  60) * H;
+
+    // Tangent for rotation
+    const dt = 0.01;
+    const t2 = Math.min(progress + dt, 1);
+    const { svgX: x2, svgY: y2 } = getPlanePos(t2);
+    const angle = Math.atan2((y2 - svgY) / 60, (x2 - svgX) / 300) * (180 / Math.PI);
+
+    plane.style.left = px + 'px';
+    plane.style.top  = py + 'px';
+    plane.style.transform = `translate(-50%, -50%) rotate(${angle}deg)`;
+  }
+
+  // ── Main tick ────────────────────────────────────────────
+  function tick() {
+    const now = new Date();
+    const remaining = TARGET - now;
+
+    if (remaining <= 0) {
+      dDays.textContent    = '0';
+      dHours.textContent   = '00';
+      dMinutes.textContent = '00';
+      dSeconds.textContent = '00';
+      updatePlane(1);
+      progressBar.style.width = '100%';
+      pctLabel.textContent = '¡Llegó el día! 🎉';
+      return;
+    }
+
+    const totalSecs  = Math.floor(remaining / 1000);
+    const secs       = totalSecs % 60;
+    const totalMins  = Math.floor(totalSecs / 60);
+    const mins       = totalMins % 60;
+    const totalHours = Math.floor(totalMins / 60);
+    const hrs        = totalHours % 24;
+    const days       = Math.floor(totalHours / 24);
+
+    dDays.textContent    = days;
+    dHours.textContent   = String(hrs).padStart(2, '0');
+    dMinutes.textContent = String(mins).padStart(2, '0');
+    dSeconds.textContent = String(secs).padStart(2, '0');
+
+    // Progress 0→1 from START to TARGET
+    const elapsed  = now - START;
+    const progress = Math.max(0, Math.min(1, elapsed / TOTAL_MS));
+    progressBar.style.width = (progress * 100).toFixed(2) + '%';
+    pctLabel.textContent    = (progress * 100).toFixed(1) + '% del camino';
+
+    updatePlane(progress);
+  }
+
+  tick();
+  setInterval(tick, 1000);
+</script>
+</body>
+</html>
