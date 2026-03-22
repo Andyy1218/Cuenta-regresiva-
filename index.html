@@ -222,7 +222,104 @@
   </div>
   <p class="phrase">Cada día un suspiro menos para nuestro abrazo.</p>
   <div class="heart">❤️</div>
+
+  <!-- Flower Button -->
+  <button id="flowerBtn" onclick="bloomFlowers()" style="
+    margin-top:22px;
+    background:linear-gradient(135deg,#f5c842,#f7a800);
+    border:none; border-radius:50px;
+    padding:13px 28px;
+    font-family:'Playfair Display',serif;
+    font-style:italic;
+    font-size:15px;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 18px rgba(245,200,66,0.45);
+    transition:transform 0.2s, box-shadow 0.2s;
+    position:relative; overflow:visible;
+  " onmouseover="this.style.transform='scale(1.07)'" onmouseout="this.style.transform='scale(1)'">
+    🌻 Para ti
+  </button>
+
+  <!-- Flower message overlay -->
+  <div id="flowerOverlay" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.55); backdrop-filter:blur(3px);
+    align-items:center; justify-content:center; flex-direction:column;
+  " onclick="closeFlowers()">
+    <div id="flowerMsg" style="
+      background:linear-gradient(135deg,#fffde7,#fff8c5);
+      border-radius:24px; padding:36px 40px; max-width:340px;
+      text-align:center; box-shadow:0 8px 40px rgba(0,0,0,0.25);
+      font-family:'Playfair Display',serif; position:relative;
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    ">
+      <div id="flowerRain" style="position:absolute;inset:0;overflow:hidden;border-radius:24px;pointer-events:none;"></div>
+      <div style="font-size:52px;margin-bottom:12px;letter-spacing:4px;">🌻🌼🌻</div>
+      <div style="font-size:40px;margin-bottom:14px;letter-spacing:2px;">🌼🌻🌼🌻🌼</div>
+      <p style="font-style:italic;font-size:18px;color:#b5860d;line-height:1.6;margin:0 0 16px;">
+        "Estas no se marchitan hasta que nos volvamos a ver"
+      </p>
+      <div style="font-size:28px;">💛</div>
+      <p style="font-size:12px;color:#ccc;margin-top:16px;font-family:'Lato',sans-serif;">Toca para cerrar</p>
+    </div>
+  </div>
 </div>
+
+<style>
+  @keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) rotate(0deg) scale(1); opacity:1; }
+    80%  { opacity:1; }
+    100% { transform: translateY(-380px) rotate(540deg) scale(0.3); opacity:0; }
+  }
+  @keyframes burstOut {
+    0%   { transform: translate(0,0) scale(0.2) rotate(0deg); opacity:0; }
+    15%  { opacity:1; transform: translate(var(--tx), var(--ty)) scale(1.3) rotate(45deg); }
+    80%  { opacity:1; }
+    100% { transform: translate(calc(var(--tx)*2.5), calc(var(--ty)*2.5 - 200px)) scale(0.5) rotate(720deg); opacity:0; }
+  }
+  .falling-flower {
+    position:absolute;
+    font-size:24px;
+    animation: floatUp 2.2s ease-out forwards;
+    pointer-events:none;
+  }
+</style>
+
+<script>
+function bloomFlowers() {
+  const overlay = document.getElementById('flowerOverlay');
+  overlay.style.display = 'flex';
+  const rain = document.getElementById('flowerRain');
+  rain.innerHTML = '';
+  const flowers = ['🌻','🌼','🌻','🌼','💛','🌻','🌼','🌻'];
+  const angles = [0,30,60,90,120,150,180,210,240,270,300,330,15,45,75,105,135,165,195,225,255,285,315,345,22,67,112,157];
+  for (let i = 0; i < 38; i++) {
+    setTimeout(() => {
+      const f = document.createElement('span');
+      f.className = 'falling-flower';
+      f.textContent = flowers[i % flowers.length];
+      const angle = (angles[i] || Math.random()*360) * Math.PI / 180;
+      const dist = 60 + Math.random() * 80;
+      const tx = Math.cos(angle) * dist;
+      const ty = Math.sin(angle) * dist;
+      f.style.left = '50%';
+      f.style.bottom = '50%';
+      f.style.setProperty('--tx', tx + 'px');
+      f.style.setProperty('--ty', ty + 'px');
+      f.style.animation = 'burstOut 2.4s ease-out forwards';
+      f.style.animationDelay = (Math.random()*0.3) + 's';
+      f.style.fontSize = (20 + Math.random()*20) + 'px';
+      rain.appendChild(f);
+      setTimeout(() => f.remove(), 3000);
+    }, i * 40);
+  }
+}
+function closeFlowers() {
+  document.getElementById('flowerOverlay').style.display = 'none';
+}
+</script>
 
 <!-- CAROUSEL CARD -->
 <div class="carousel-card">
